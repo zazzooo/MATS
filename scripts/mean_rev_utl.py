@@ -1,0 +1,25 @@
+import pandas as pd
+
+def create_mean_rev_signal(data, long_wind, short_wind):
+    '''
+    input 
+    data: pandas dataframe with prices of securities (name of the column security)
+    long_wind: the long window you want for the mean reverse strategy
+    short_wind: the short windw you want for the mean reverse strategy
+    
+    output:
+    final_df: pandas df filled with 1 or -1 accordingly to the mean reverse strategy
+    df_rolling_mean: df with the means over the different windows for debugging
+    '''
+    final_df = pd.DataFrame()
+    df_rolling_mean = pd.DataFrame()
+    for sec in data.columns:
+        sec_df = pd.DataFrame(columns = [sec])
+        long_wind_df = data[sec].rolling(long_wind).mean() #creating the long window df
+        df_rolling_mean[sec + '_long'] = long_wind_df #for debugging
+        short_wind_df = data[sec].rolling(short_wind).mean() #creating the short window df
+        df_rolling_mean[sec + '_short'] = short_wind_df #for debugging
+        sec_df[sec] = (short_wind_df - long_wind_df).dropna() #subtracting the long and the short
+        sec_df[sec] = sec_df[sec].apply(lambda x: 1 if x>0 else -1) #subsitute positive value with 1 and negative with a -1
+        final_df[sec] = sec_df[sec]
+    return final_df, df_rolling_mean
