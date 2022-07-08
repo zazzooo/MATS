@@ -121,8 +121,9 @@ if __name__ == '__main__':
     #set parameters
     DM_list_securities = ['SPY','TLT', 'TIP', 'GLD'] #20/120
     EM_list_securities = ['GXC','PCY', 'GLD'] #5/25
-    list_securities = ['BKF','ILF', 'ASEA','AFK'] #5/25
-    tkr = 'BKF'
+    Asia_list_securities = ['BKF','ILF', 'ASEA','AFK'] #5/25
+    list_securities = DM_list_securities #5/25
+    tkr = 'SPY'
     window = 30 #days
 
     #get market data
@@ -139,8 +140,8 @@ if __name__ == '__main__':
     #data_iv_port_rets.dropna(inpl  
 
     #setup trend following portfolio
-    ma_s = 5
-    ma_l = 25
+    ma_s = 20
+    ma_l = 120
     sma_s = df_sig_sma(data, ma_s)
     sma_l = df_sig_sma(data, ma_l)
     sma_sig = df_sig_sma_cr(data, ma_s, ma_l)
