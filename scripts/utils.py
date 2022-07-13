@@ -84,7 +84,7 @@ def freq_of_ts(se):
     """
     
     start, end = se.index.min(), se.index.max()
-    diff = end - start
+    diff = pd.to_datetime(end) - pd.to_datetime(start)
     return round((len(se)-1) * 365.25 / diff.days, 2)
 
 
