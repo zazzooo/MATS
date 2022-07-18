@@ -23,3 +23,21 @@ def create_mean_rev_signal(data, long_wind, short_wind):
         sec_df[sec] = sec_df[sec].apply(lambda x: 1 if x>0 else -1) #subsitute positive value with 1 and negative with a -1
         final_df[sec] = sec_df[sec]
     return final_df, df_rolling_mean
+
+def filter_dataframe_hl(df_tot, list_securities):
+    df_output = pd.DataFrame()
+    for security in list_securities:
+        df_output[security + '_high'] = df_tot[security]['High']
+        df_output[security + '_low'] = df_tot[security]['Low']
+        df_output.dropna(inplace = True)
+    return df_output
+
+def filter_dataframe_holc(df_tot, list_securities):
+    df_output = pd.DataFrame()
+    for security in list_securities:
+        df_output[security + '_open'] = df_tot[security]['Open']
+        df_output[security + '_high'] = df_tot[security]['High']
+        df_output[security + '_low'] = df_tot[security]['Low']
+        df_output[security + '_close'] = df_tot[security]['Close']
+        df_output.dropna(inplace = True)
+    return df_output
