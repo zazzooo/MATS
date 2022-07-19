@@ -29,7 +29,7 @@ def filter_dataframe_hl(df_tot, list_securities):
     for security in list_securities:
         df_output[security + '_high'] = df_tot[security]['High']
         df_output[security + '_low'] = df_tot[security]['Low']
-        df_output.dropna(inplace = True)
+        #df_output.dropna(inplace = True)
     return df_output
 
 def filter_dataframe_holc(df_tot, list_securities):
@@ -39,5 +39,5 @@ def filter_dataframe_holc(df_tot, list_securities):
         df_output[security + '_high'] = df_tot[security]['High']
         df_output[security + '_low'] = df_tot[security]['Low']
         df_output[security + '_close'] = df_tot[security]['Close']
-        df_output.dropna(inplace = True)
+        #df_output.dropna(inplace = True)
     return df_output

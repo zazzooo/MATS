@@ -46,7 +46,7 @@ def df_wheighted(inv_volat_df):
 
     #create a new df with the same columns
     df = pd.DataFrame(columns = inv_volat_df.columns)
-
+    inv_volat_df.fillna(0, inplace = True)
     #itarate over row (always avoid it, if possible)
     for index, row in inv_volat_df.iterrows():
 
