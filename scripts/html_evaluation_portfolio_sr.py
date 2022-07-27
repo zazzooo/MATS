@@ -81,14 +81,15 @@ def df_inverse_volatility(df_perc, window):
 
 def df_weighted(inv_volat_df):
 
-    #create a new df with the same columns
-    df = pd.DataFrame(columns = inv_volat_df.columns)
+    #create a copy of the df with the same columns
+    df = inv_volat_df.copy()
 
-    #itarate over row (always avoid it, if possible)
-    for index, row in inv_volat_df.iterrows():
+    #create a column with the sum
+    df['sum_vol'] = df.apply(np.sum, axis = 1)
 
-        #append the new value at each row
-        df.loc[index] = row.div(sum(list(row)))
+    #divide each row for the value of the new column
+    df = df.apply(lambda row: row/row['sum_vol'], axis = 1)
+    df.drop(columns= ['sum_vol'], inplace = True)
     return df
 
 

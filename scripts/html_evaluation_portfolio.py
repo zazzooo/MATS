@@ -15,7 +15,7 @@ def create_dataframe(list_securities, start_date = pd.to_datetime('2007-01-03'),
         SEC = yf.Ticker(security)
         if start_date:
             hist = SEC.history(start = start_date, end = end_date)
-        else:    
+        else:
             hist = SEC.history(period="max")
         df[security] = hist['Close'] #I just consider the close price, is that correct?
         #df.dropna() #if this line the data are only from 2010 otyherwise some columns arrive until 2006
@@ -27,7 +27,7 @@ def create_dataframe_polygon(list_securities, start_date = '2007-01-03', end_dat
         pc = pf.PolygonClient()
         client = pc.get_client()
         hist = pc.get_equity_bar_data(security, 1, "day",start_date, end_date)
-        
+
         df[security] = hist['close'] #I just consider the close price, is that correct?
         #df.dropna() #if this line the data are only from 2010 otyherwise some columns arrive until 2006
     return df
@@ -44,14 +44,15 @@ def df_inverse_volatility(df_perc, window):
 
 def df_wheighted(inv_volat_df):
 
-    #create a new df with the same columns
-    df = pd.DataFrame(columns = inv_volat_df.columns)
-    inv_volat_df.fillna(0, inplace = True)
-    #itarate over row (always avoid it, if possible)
-    for index, row in inv_volat_df.iterrows():
+    #create a copy of the df with the same columns
+    df = inv_volat_df.copy()
 
-        #append the new value at each row
-        df.loc[index] = row.div(sum(list(row)))
+    #create a column with the sum
+    df['sum_vol'] = df.apply(np.sum, axis = 1)
+
+    #divide each row for the value of the new column
+    df = df.apply(lambda row: row/row['sum_vol'], axis = 1)
+    df.drop(columns= ['sum_vol'], inplace = True)
     return df
 
 
@@ -74,20 +75,20 @@ def df_earnings_equal_weight(df_percentage):
 def transaction_cost_computation(df_weighted, rebalance, initial_capital):
     # df where store the result
     quantity_to_balance = pd.DataFrame(columns = df_weighted.columns)
-    
+
     df_weighted.dropna(inplace = True)
     df_weighted = df_weighted[start_date: end_date]
     perc_ret = data_earnings['Tot'].add(1).cumprod()
-    
+
     #compute the capital -it changes during the investing time-
     capital =  perc_ret*initial_capital
-    
+
     # cycle every time the portfolio is rebalanced
     for index in range(len(df_weighted)//rebalance):
         transition_array = []
         #cycle over the securities
-        for sec in df_weighted.columns: 
-            if index > 0: 
+        for sec in df_weighted.columns:
+            if index > 0:
                 # append the difference between the value before and after the rebalance
                 transition_array.append(df_weighted[sec].iloc[index*rebalance+1]-df_weighted[sec].iloc[index*rebalance-1])
             if len(transition_array) == len(quantity_to_balance.columns):
@@ -95,26 +96,26 @@ def transaction_cost_computation(df_weighted, rebalance, initial_capital):
                 # append in the final dataframe
                 quantity_to_balance = pd.concat([quantity_to_balance, df_to_append])
                 # quantity to balance: percetange of capital to trade for balancing the portfolio
-    
-    
+
+
     capital = capital.loc[quantity_to_balance.index.to_list()]
     quantity_to_balance = quantity_to_balance.mul(capital, axis = 0)
-    
+
     number_of_sec_exchange = pd.DataFrame()
-    
-    # iterate over the index and the row 
+
+    # iterate over the index and the row
     for index, row in quantity_to_balance.iterrows():
         number_of_sec_exchange_array = []
         # repete the passages for each security
         for sec in quantity_to_balance.columns:
-            # append to the array the money I have to move over the price that day 
+            # append to the array the money I have to move over the price that day
             # To get the numbers of trades necessary that day for the specific security
             number_of_sec_exchange_array.append(row[sec]/data.loc[index][sec])
         if len(number_of_sec_exchange_array) == len(quantity_to_balance.columns): # when it is done for every security, append the result to the dataframe
             #create dataframe to concatenate
             df_to_append = pd.DataFrame([number_of_sec_exchange_array], columns = quantity_to_balance.columns, index = [index])
             # concatenate the existence dataframe with the enw one
-            number_of_sec_exchange = pd.concat([number_of_sec_exchange, df_to_append])    
+            number_of_sec_exchange = pd.concat([number_of_sec_exchange, df_to_append])
             # number_of_sec_exchange: number of security necessary to exchange to rebalance the porfolio
     return number_of_sec_exchange
 

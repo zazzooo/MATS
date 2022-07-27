@@ -118,8 +118,15 @@ def create_dataframe_ohlc_polygon(list_securities, start_date, end_date):
     return df
 
 def compute_satchell_volatility(df_ohlc, list_securities, window):
-    '''write descreiption'''
+    '''
+    input
+    df_ohlcv = pandas dataframe, index: timestamp; column: name security + ohlc; value: ohlc price (or what ever you need).
+    list_securities = list of securiyties used
+    window = number of day you want ton compute the standard deviation on.
 
+     output
+     df_output = pandas dataframe with security as column, and satchell volatility as value (per security)
+    '''
     df_output = pd.DataFrame()
 
     for security in list_securities:

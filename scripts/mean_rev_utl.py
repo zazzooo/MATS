@@ -19,9 +19,10 @@ def create_mean_rev_signal(data, long_wind, short_wind):
         df_rolling_mean[sec + '_long'] = long_wind_df #for debugging
         short_wind_df = data[sec].rolling(short_wind).mean() #creating the short window df
         df_rolling_mean[sec + '_short'] = short_wind_df #for debugging
-        sec_df[sec] = (short_wind_df - long_wind_df).dropna() #subtracting the long and the short
-        sec_df[sec] = sec_df[sec].apply(lambda x: 1 if x>0 else -1) #subsitute positive value with 1 and negative with a -1
+        sec_df[sec] = (short_wind_df - long_wind_df) #subtracting the long and the short
+        #sec_df[sec] = sec_df[sec].apply(lambda x: 1 if x>0 else -1) 
         final_df[sec] = sec_df[sec]
+    final_df = final_df.applymap(lambda x: 1 if x>0 else -1, na_action = 'ignore') #subsitute positive value with 1 and negative with a -1
     return final_df, df_rolling_mean
 
 def filter_dataframe_hl(df_tot, list_securities):
