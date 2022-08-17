@@ -1,4 +1,5 @@
 import pandas as pd
+from math import isnan
 
 def create_mean_rev_signal(data, long_wind, short_wind):
     '''
@@ -42,3 +43,10 @@ def filter_dataframe_holc(df_tot, list_securities):
         df_output[security + '_close'] = df_tot[security]['Close']
         #df_output.dropna(inplace = True)
     return df_output
+
+def number_nan(row):
+    count = 0
+    for i in range(len(row)):
+        if isnan(row[i]):
+            count += 1
+    return len(row)-count
