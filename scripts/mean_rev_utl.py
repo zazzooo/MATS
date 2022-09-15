@@ -1,5 +1,6 @@
 import pandas as pd
 from math import isnan
+import pandas_ta as ta
 
 def create_mean_rev_signal(data, long_wind, short_wind):
     '''
@@ -50,3 +51,21 @@ def number_nan(row):
         if isnan(row[i]):
             count += 1
     return len(row)-count
+
+def create_kama_signal_df(data):
+    '''
+    input 
+    data: pandas dataframe with prices of securities (name of the column security)
+    
+    output:
+    final_df: pandas df filled with 1 or -1 accordingly to the kama strategy
+    '''
+    final_df = pd.DataFrame()
+    df_kama = pd.DataFrame()
+    for sec in data.columns:
+        sec_df = pd.DataFrame(columns = [sec])
+        sec_df[sec] = (ta.overlap.kama(data[sec]) - data[sec]) #subtracting the long and the short
+        #sec_df[sec] = sec_df[sec].apply(lambda x: 1 if x>0 else -1) 
+        final_df[sec] = sec_df[sec]
+    final_df = final_df.applymap(lambda x: 1 if x>0 else -1, na_action = 'ignore') #subsitute positive value with 1 and negative with a -1
+    return final_df
